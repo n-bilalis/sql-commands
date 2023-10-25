@@ -157,16 +157,16 @@ app.get("/create_issue", (req, res) => {
 	const sql_j = "";
 	dbquery(sql_j, db).then( rows => {
 		rows_j = rows;
-    }, err => {
-        return dbclose(db).then( () => { throw err; } )
-    } )
-    .then( () => {
+	}, err => {
+		return dbclose(db).then( () => { throw err; } )
+	} )
+	.then( () => {
 		res.render("create_issue", { journalmodel: rows_j });
-    } )
-    .catch( err => {
-        // handle the error
+	} )
+	.catch( err => {
+		// handle the error
 		console.log(err);
-    } );
+	} );
 });
 
 app.post("/create_issue", (req, res) => {
@@ -191,20 +191,20 @@ app.get("/create_article", (req, res) => {
 	const sql_i = "";
 	dbquery(sql_au, db).then( rows => {
 		rows_au = rows;
-        return dbquery(sql_i, db);
-    } )
+		return dbquery(sql_i, db);
+	} )
 	.then( rows => {
-        rows_i = rows;
-    }, err => {
-        return dbclose(db).then( () => { throw err; } )
-    } )
-    .then( () => {
+		rows_i = rows;
+	}, err => {
+		return dbclose(db).then( () => { throw err; } )
+	} )
+	.then( () => {
 		res.render("create_article", { authormodel: rows_au, issuemodel: rows_i });
-    } )
-    .catch( err => {
-        // handle the error
+	} )
+	.catch( err => {
+		// handle the error
 		console.log(err);
-    } );
+	} );
 });
 
 app.post("/create_article", (req, res) => {
@@ -316,42 +316,42 @@ app.post("/delete_article/:id", (req, res) => {
 //
 
 function dbquery(sql, db, args) {
-    return new Promise((resolve, reject) => {
-        db.all(sql, args, (err, rows) => {
-            if (err)
-                return reject(err);
-            resolve(rows);
-        });
-    });
+	return new Promise((resolve, reject) => {
+		db.all(sql, args, (err, rows) => {
+			if (err)
+				return reject(err);
+			resolve(rows);
+		});
+	});
 }
 
 function dbquery_one(sql, db, args) {
-    return new Promise((resolve, reject) => {
-        db.get(sql, args, (err, rows) => {
-            if (err)
-                return reject(err);
-            resolve(rows);
-        });
-    });
+	return new Promise((resolve, reject) => {
+		db.get(sql, args, (err, rows) => {
+			if (err)
+				return reject(err);
+			resolve(rows);
+		});
+	});
 }
 
 function dbquery_run(sql, db, args) {
-    return new Promise((resolve, reject) => {
-        db.run(sql, args, (err, rows) => {
-            if (err)
-                return reject(err);
-            resolve(rows);
-        });
-    });
+	return new Promise((resolve, reject) => {
+		db.run(sql, args, (err, rows) => {
+			if (err)
+				return reject(err);
+			resolve(rows);
+		});
+	});
 }
 
 function dbclose(db) {
-    return new Promise((resolve, reject) => {
-	    db.close(err => {
-            if (err) {
-	            return reject(err);
+	return new Promise((resolve, reject) => {
+		db.close(err => {
+			if (err) {
+				return reject(err);
 			}
-            resolve();
-        });
-    });
+			resolve();
+		});
+	});
 }
