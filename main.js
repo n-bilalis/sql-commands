@@ -324,6 +324,29 @@ app.post("/edit_author/:id", (req, res) => {
 	});
 });
 
+app.get("/edit_journal/:id", (req, res) => {
+	const sql = "SELECT j_id, title FROM Journal WHERE j_id = ?";
+	const id = req.params.id;
+	db.get(sql, id, (err, row) => {
+		if (err) {
+			console.log(err);
+		}
+		res.render("edit_journal", { model: row });
+	});
+});
+
+app.post("/edit_journal/:id", (req, res) => {
+	const sql = "UPDATE Journal SET title = ? WHERE j_id = ?"
+	const id = req.params.id;
+	const journal = [req.body.Title, id];
+	db.run(sql, journal, err => {
+		if (err) {
+			console.log(err);
+		}
+		res.redirect("/journals");
+	});
+});
+
 //
 // Delete an article
 //
