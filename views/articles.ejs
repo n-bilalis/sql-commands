@@ -1,0 +1,53 @@
+<%- include("_header") -%>
+
+<h1>List of articles (<%= model.length %>)</h1>
+
+
+
+<div class="table-responsive-sm">
+  <form action="/search_articles" method="get">
+  <div class="form-horizontal">
+
+	<div class="form-group row">
+	  <label class="col-form-label col-sm-2" for="q">Title search</label>
+	  <div class="col-sm-8">
+		<input autofocus class="form-control" name="q" value="" />
+	  </div>
+	</div>
+    <div class="form-group row">
+      <label class="col-form-label col-sm-2"></label>
+      <div class="col-sm-10">
+        <input type="submit" value="Search" class="btn btn-default btn-warning" />
+      </div>
+    </div>
+  </form>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Authors</th>
+        <th>Journal</th>
+		<th>Issue</th>
+        <th class="d-print-none">
+          <a class="btn btn-sm btn-success" href="/create_article">Add</a>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for (const article of model) { %>
+        <tr>
+          <td><%= article.a_title %></td>
+          <td><%= article.name %></td>
+          <td><%= article.j_title %></td>
+		  <td><%= article.number %></td>
+          <td class="d-print-none">
+            <a class="btn btn-sm btn-warning" href="/edit_article_basic/<%= article.a_id %>">Edit (title only)</a>
+            <a class="btn btn-sm btn-danger" href="/delete_article/<%= article.a_id %>">Delete</a>
+          </td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<%- include("_footer") -%>

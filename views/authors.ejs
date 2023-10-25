@@ -1,0 +1,30 @@
+<%- include("_header") -%>
+
+<h1>List of authors (<%= model.length %>)</h1>
+
+
+
+<div class="table-responsive-sm">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th class="d-print-none">
+          <a class="btn btn-sm btn-success" href="/create_author">Add</a>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for (const author of model) { %>
+        <tr>
+          <td><%= author.name %></td>
+          <td class="d-print-none">
+            <a class="btn btn-sm btn-warning" href="/edit_author/<%= author.au_id %>">Edit</a>
+          </td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<%- include("_footer") -%>

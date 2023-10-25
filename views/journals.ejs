@@ -1,0 +1,30 @@
+<%- include("_header") -%>
+
+<h1>List of journals (<%= model.length %>)</h1>
+
+
+
+<div class="table-responsive-sm">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th class="d-print-none">
+          <a class="btn btn-sm btn-success" href="/create_journal">Add</a>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for (const journal of model) { %>
+        <tr>
+          <td><%= journal.title %></td>
+          <td class="d-print-none">
+            <a class="btn btn-sm btn-warning" href="/edit_journal/<%= journal.j_id %>">Edit</a>
+          </td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<%- include("_footer") -%>

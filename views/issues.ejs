@@ -1,0 +1,32 @@
+<%- include("_header") -%>
+
+<h1>List of issues (<%= model.length %>)</h1>
+
+
+
+<div class="table-responsive-sm">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Number</th>
+		<th>Journal</th>
+        <th class="d-print-none">
+          <a class="btn btn-sm btn-success" href="/create_issue">Add</a>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for (const issue of model) { %>
+        <tr>
+          <td><%= issue.number %></td>
+		  <td><%= issue.title %></td>
+          <td class="d-print-none">
+            <a class="btn btn-sm btn-warning" href="/edit_issue/<%= issue.i_id %>">Edit</a>
+          </td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<%- include("_footer") -%>

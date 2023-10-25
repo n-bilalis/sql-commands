@@ -1,0 +1,29 @@
+<%- include("_header") -%>
+
+<h1>Update an article</h1>
+
+<form action="/edit_article_basic/<%= model.a_id %>" method="post">
+  <div class="form-horizontal">
+
+	<div class="form-group row">
+	  <label class="col-form-label col-sm-2" for="Title">Title</label>
+	  <div class="col-sm-8">
+		<input autofocus class="form-control" name="Title" value="<%= model.title %>" />
+	  </div>
+	</div>
+	
+	<input type="hidden" value="<%= model.i_id %>" name="Issue"/>
+	<input type="hidden" value="<%= model.au_id %>" name="Author"/>
+	
+    <div class="form-group row">
+      <label class="col-form-label col-sm-2"></label>
+      <div class="col-sm-10">
+        <input type="submit" value="Update" class="btn btn-default btn-warning" />
+        <a class="btn btn-outline-dark cancel" href="/articles">Cancel</a>
+      </div>
+    </div>
+
+  </div>
+</form>
+
+<%- include("_footer") -%>
