@@ -301,6 +301,29 @@ app.post("/edit_article_basic/:id", (req, res) => {
 
 });
 
+app.get("/edit_author/:id", (req, res) => {
+	const sql = "SELECT au_id, name FROM Author WHERE au_id = ?";
+	const id = req.params.id;
+	db.get(sql, id, (err, row) => {
+		if (err) {
+			console.log(err);
+		}
+		res.render("edit_author", { model: row });
+	});
+});
+
+app.post("/edit_author/:id", (req, res) => {
+	const sql = "UPDATE Author SET name = ? WHERE au_id = ?"
+	const id = req.params.id;
+	const author = [req.body.Name, id];
+	db.run(sql, author, err => {
+		if (err) {
+			console.log(err);
+		}
+		res.redirect("/authors");
+	});
+});
+
 //
 // Delete an article
 //
