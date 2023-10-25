@@ -48,7 +48,15 @@ app.get("/articles", (req, res) => {
 	// write an SQL command that joins the tables Journal, Issue, Article, Article_Author and Author, sort the list
 	// the following fields are required: article id and title, journal title, issue number and author name
 	// disambiguation is needed
-	const sql = "";
+	const sql = `
+		SELECT Article.a_id, Article.title AS a_title, Journal.title AS j_title, Issue.number, GROUP_CONCAT(Author.name, '; ') AS name
+		FROM Article
+		INNER JOIN Issue ON Article.i_id = Issue.i_id
+		INNER JOIN Journal ON Issue.j_id = Journal.j_id
+		INNER JOIN Article_Author ON Article.a_id = Article_Author.a_id
+		INNER JOIN Author ON Article_Author.au_id = Author.au_id
+		GROUP BY Article.a_id, Article.title, Journal.title, Issue.number
+		ORDER BY Journal.title, Issue.number`;
 	db.all(sql, [], (err, rows) => {
 		if (err) {
 			return console.error(err.message);
@@ -60,7 +68,7 @@ app.get("/articles", (req, res) => {
 
 app.get("/authors", (req, res) => {
 	// write an SQL command that selects au_id and name for all authors, sort the list
-	const sql = "";
+	const sql = "SELECT au_id, name FROM Author ORDER BY name";
 	db.all(sql, [], (err, rows) => {
 		if (err) {
 			return console.error(err.message);
@@ -72,7 +80,7 @@ app.get("/authors", (req, res) => {
 
 app.get("/journals", (req, res) => {
 	// write an SQL command that selects j_id and title for all journals, sort the list
-	const sql = "";
+	const sql = "SELECT j_id, title FROM Journal ORDER BY title";
 	db.all(sql, [], (err, rows) => {
 		if (err) {
 			return console.error(err.message);
@@ -85,7 +93,11 @@ app.get("/journals", (req, res) => {
 app.get("/issues", (req, res) => {
 	// write an SQL command that joins Issue with Journal, sort the list
 	// issue id and number, and journal title are required
-	const sql = "";
+	const sql = `
+		SELECT Issue.i_id, Issue.number, Journal.title
+		FROM Issue
+		INNER JOIN Journal ON Issue.j_id = Journal.j_id
+		ORDER BY Journal.title, Issue.number`;
 	db.all(sql, [], (err, rows) => {
 		if (err) {
 			return console.error(err.message);
@@ -102,8 +114,18 @@ app.get("/search_articles/", (req, res) => {
 	// some kind of search functionality should be build in, where q is the search query
 	// the following fields are required: article id and title, journal title, issue number and author name
 	// disambiguation is needed
-	const sql = "";
-	db.all(sql, [], (err, rows) => {
+	const sql = `
+		SELECT Article.a_id, Article.title AS a_title, Journal.title AS j_title, Issue.number, GROUP_CONCAT(Author.name, '; ') AS name
+		FROM Article
+		INNER JOIN Issue ON Article.i_id = Issue.i_id
+		INNER JOIN Journal ON Issue.j_id = Journal.j_id
+		INNER JOIN Article_Author ON Article.a_id = Article_Author.a_id
+		INNER JOIN Author ON Article_Author.au_id = Author.au_id
+		WHERE Article.title LIKE ? OR Journal.title LIKE ? OR Issue.number LIKE ? OR Author.name LIKE ?
+		GROUP BY Article.a_id, Article.title, Journal.title, Issue.number
+		ORDER BY Journal.title, Issue.number`;
+	const param = `%${q.trim()}%`;
+	db.all(sql, [param, param, param, param], (err, rows) => {
 		if (err) {
 			return console.error(err.message);
 		}
@@ -122,7 +144,7 @@ app.get("/create_journal", (req, res) => {
 
 app.post("/create_journal", (req, res) => {
 	// create an insert SQL command to add a journal title
-	const sql = "";
+	const sql = "INSERT INTO Journal (title) VALUES (?)";
 	// pick up the relevant field(s) from req.body
 	const journal = [req.body.Title];
 	db.run(sql, journal, err => {
@@ -139,7 +161,7 @@ app.get("/create_author", (req, res) => {
 
 app.post("/create_author", (req, res) => {
 	// create an insert SQL command to add an author name
-	const sql = "";
+	const sql = "INSERT INTO Author (name) VALUES (?)";
 	// pick up the relevant field(s) from req.body
 	const author = [req.body.Name];
 	db.run(sql, author, err => {
@@ -154,7 +176,7 @@ app.get("/create_issue", (req, res) => {
 	// we need a list of journals to create an issue
 	let rows_j;
 	// write an SQL command that selects journal id and title for all journals, sort the list
-	const sql_j = "";
+	const sql_j = "SELECT j_id, title FROM Journal ORDER BY title";
 	dbquery(sql_j, db).then( rows => {
 		rows_j = rows;
 	}, err => {
@@ -171,7 +193,7 @@ app.get("/create_issue", (req, res) => {
 
 app.post("/create_issue", (req, res) => {
 	// create an insert SQL command to add a journal id and issue number to Issue
-	const sql = "";
+	const sql = "INSERT INTO Issue (j_id, number) VALUES (?, ?)";
 	// pick up the relevant field(s) from req.body (the order must be the same as in the query)
 	const issue = [req.body.Journal, req.body.Number];
 	db.run(sql, issue, err => {
@@ -185,10 +207,14 @@ app.post("/create_issue", (req, res) => {
 app.get("/create_article", (req, res) => {
 	let rows_au, rows_i;
 	// create an SQL command that selects author id and name for all authors, sort the list
-	const sql_au = "";
+	const sql_au = "SELECT au_id, name FROM Author ORDER BY name";
 	// create an SQL command that joins Issue with Journal, sort the list
 	// required fields are issue id and number, and journal title
-	const sql_i = "";
+	const sql_i = `
+		SELECT Issue.i_id, Issue.number, Journal.title
+		FROM Issue
+		INNER JOIN Journal ON Issue.j_id = Journal.j_id
+		ORDER BY Journal.title, Issue.number`;
 	dbquery(sql_au, db).then( rows => {
 		rows_au = rows;
 		return dbquery(sql_i, db);
@@ -209,7 +235,7 @@ app.get("/create_article", (req, res) => {
 
 app.post("/create_article", (req, res) => {
 	// create an insert SQL command to add an issue id and a title to Article
-	const sql = "";
+	const sql = "INSERT INTO Article (i_id, title) VALUES (?, ?)";
 	// pick up the relevant field(s) from req.body (the order must be the same as in the array)
 	const article = [req.body.Issue, req.body.Title];
 	const au_list = [req.body.Author, req.body.SecondAuthor, req.body.ThirdAuthor];
@@ -248,7 +274,7 @@ app.post("/create_article", (req, res) => {
 // Title only
 app.get("/edit_article_basic/:id", (req, res) => {
 	// write an SQL command that selects id, title, issue id for the article with the given id
-	const sql = "";
+	const sql = "SELECT a_id, title, i_id FROM Article WHERE a_id = ?";
 	// pick up article id from the URL (req.params.id)
 	const id = req.params.id;
 	db.get(sql, id, (err, row) => {
@@ -261,7 +287,7 @@ app.get("/edit_article_basic/:id", (req, res) => {
 
 app.post("/edit_article_basic/:id", (req, res) => {
 	// write an SQL command that updates the article with the given id (the order must be the same as in the array)
-	const sql = "";
+	const sql = "UPDATE Article SET title = ? WHERE a_id = ?"
 	// pick up article id from the URL (req.params.id)
 	const id = req.params.id;
 	// pick up the relevant field(s) from req.body and add id
@@ -281,7 +307,7 @@ app.post("/edit_article_basic/:id", (req, res) => {
 
 app.get("/delete_article/:id", (req, res) => {
 	// write an SQL command that selects id, title for the article with the given id
-	const sql = "";
+	const sql = "SELECT a_id, title FROM Article WHERE a_id = ?";
 	// pick up article id from the URL (req.params.id)
 	const id = req.params.id;
 	db.get(sql, id, (err, row) => {
@@ -294,7 +320,7 @@ app.get("/delete_article/:id", (req, res) => {
 
 app.post("/delete_article/:id", (req, res) => {
 	// write an SQL command that deletes the article with the given id
-	const sql = "";
+	const sql = "DELETE FROM Article WHERE a_id = ?";
 	// pick up article id from the URL (req.params.id)
 	const id = req.params.id;
 	db.run(sql, id, (err) => {
@@ -302,7 +328,7 @@ app.post("/delete_article/:id", (req, res) => {
 			console.log(err);
 		}
 		// write an SQL command that deletes the corresponding rows in the Article_Author link table
-		db.run("", id, (err) => {
+		db.run("DELETE FROM Article_Author WHERE a_id = ?", id, (err) => {
 			if (err) {
 				console.log(err);
 			}
